@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>divi — Remote Control Panel | لوحة التحكم عن بُعد</title>
+  <style>
+    :root {
+      --bg: #07090F;
+      --surface: #101422;
+      --surface-hi: #171D30;
+      --border: #252E4A;
+      --cyan: #00E5FF;
+      --violet: #9B5CFF;
+      --green: #00E676;
+      --red: #FF4D6D;
+      --text: #F4F7FF;
+      --muted: #94A3C4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: radial-gradient(circle at top right, rgba(0,229,255,0.12), transparent 38%),
+                  radial-gradient(circle at bottom left, rgba(155,92,255,0.14), transparent 42%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 980px; margin: 0 auto; }
+    .header {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 14px; padding: 18px 22px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 20px; margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      display: grid; place-items: center; font-weight: 900; font-size: 20px; color: #07090F;
+    }
+    .brand h1 { font-size: 22px; letter-spacing: 0.4px; }
+    .brand p { font-size: 13px; color: var(--muted); }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px; font-weight: 700;
+      cursor: pointer; font-size: 14px; transition: transform .15s, opacity .15s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: .95; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-cyan { background: var(--cyan); color: #07090F; }
+    .btn-violet { background: var(--violet); color: #fff; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-red { background: rgba(255,77,109,.16); color: var(--red); border: 1px solid rgba(255,77,109,.4); padding: 8px 12px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 20px; margin-bottom: 18px;
+    }
+    .card h2 { font-size: 18px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab {
+      flex: 1; padding: 11px; text-align: center; border-radius: 12px; cursor: pointer;
+      background: var(--surface-hi); border: 1px solid var(--border); color: var(--muted); font-weight: 700;
+    }
+    .tab.active { background: rgba(0,229,255,.15); border-color: var(--cyan); color: var(--cyan); }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    .field input, .field select {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--surface-hi); color: var(--text); font-size: 14px; outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--cyan); }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .item {
+      background: var(--surface-hi); border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block; padding: 3px 9px; border-radius: 8px; font-size: 11px; font-weight: 700;
+      background: rgba(0,229,255,.15); color: var(--cyan); margin-inline-end: 6px;
+    }
+    .badge-tv { background: rgba(0,230,118,.15); color: var(--green); }
+    .badge-violet { background: rgba(155,92,255,.2); color: var(--violet); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; direction: ltr; display: inline-block; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .alert {
+      padding: 13px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; display: none;
+    }
+    .alert.ok { display: block; background: rgba(0,230,118,.14); border: 1px solid var(--green); color: var(--green); }
+    .alert.err { display: block; background: rgba(255,77,109,.14); border: 1px solid var(--red); color: #ff9eb0; }
+    .auth-box { text-align: center; padding: 44px 20px; }
+    .auth-box h2 { justify-content: center; font-size: 24px; margin-bottom: 10px; }
+    .auth-box p { color: var(--muted); max-width: 520px; margin: 0 auto 24px; line-height: 1.7; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="logo-badge">divi</div>
+        <div>
+          <h1>لوحة التحكم عن بُعد — divi Panel</h1>
+          <p>صيفط اشتراكات Xtream Codes و M3U مباشرة للتلفاز بحال IBO Player</p>
+        </div>
+      </div>
+      <div id="userBar" class="hidden" style="display:flex;align-items:center;gap:10px;">
+        <span id="userEmail" class="muted mono"></span>
+        <button id="btnSignOut" class="btn btn-outline">خروج / Sign Out</button>
+      </div>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <!-- Sign-in View -->
+    <div id="authSection" class="card auth-box">
+      <h2>سجّل الدخول بحساب Google ديالك</h2>
+      <p>
+        استعمل نفس حساب Google اللي مسجّل بيه داخل تطبيق <strong>divi</strong> فالتلفاز.
+        بمجرد ما تصيفط أي اشتراك من هنا، غيطلع أوتوماتيكياً فالتلفاز فالحين بلا ما تكتب بالتيليكوموند!
+      </p>
+      <button id="btnSignIn" class="btn btn-cyan" style="padding:14px 28px;font-size:16px;">
+        تسجيل الدخول بـ Google — Sign in with Google
+      </button>
+      <p id="fileProtocolHint" class="muted hidden" style="margin-top:16px;color:#ffd166;">
+        ⚠️ ملاحظة: باش يخدم تسجيل الدخول بـ Google، خاص هاد الصفحة تكون مفتوحة عبر رابط إنترنت (بحال GitHub Pages: <code>https://dino788.github.io/divi/</code>) ماشي كملف محلي <code>file://</code>.
+      </p>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardSection" class="hidden">
+      <div class="grid-2">
+        <!-- Send Playlist Card -->
+        <div class="card">
+          <h2>📡 إرسال اشتراك جديد للتلفاز</h2>
+
+          <div class="field">
+            <label>اختار الجهاز المستهدف (Target TV / Device):</label>
+            <select id="targetMacSelect">
+              <option value="ALL">كل الأجهزة المرتبطة (ALL Devices)</option>
+            </select>
+          </div>
+
+          <div class="tabs">
+            <div id="tabXtream" class="tab active">Xtream Codes</div>
+            <div id="tabM3u" class="tab">M3U / M3U8 URL</div>
+          </div>
+
+          <!-- Xtream Form -->
+          <form id="xtreamForm">
+            <div class="field">
+              <label>اسم القائمة (Playlist Name)</label>
+              <input id="xtName" type="text" placeholder="مثال: VIP IPTV Maroc" required maxlength="100" />
+            </div>
+            <div class="field">
+              <label>رابط السيرفر (Server URL)</label>
+              <input id="xtServer" type="url" dir="ltr" placeholder="http://server.domain:8080" required maxlength="512" />
+            </div>
+            <div class="field">
+              <label>اسم المستخدم (Username)</label>
+              <input id="xtUser" type="text" dir="ltr" placeholder="username" required maxlength="128" />
+            </div>
+            <div class="field">
+              <label>كلمة المرور (Password)</label>
+              <input id="xtPass" type="text" dir="ltr" placeholder="password" required maxlength="128" />
+            </div>
+            <button type="submit" id="btnSendXtream" class="btn btn-cyan" style="width:100%;">
+              🚀 إرسال Xtream للتلفاز دابا
+            </button>
+          </form>
+
+          <!-- M3U Form -->
+          <form id="m3uForm" class="hidden">
+            <div class="field">
+              <label>اسم القائمة (Playlist Name)</label>
+              <input id="m3uName" type="text" placeholder="مثال: Sports & Movies M3U" required maxlength="100" />
+            </div>
+            <div class="field">
+              <label>رابط M3U / M3U8</label>
+              <input id="m3uUrl" type="url" dir="ltr" placeholder="http://provider.com/get.php?type=m3u_plus" required maxlength="2048" />
+            </div>
+            <div class="field">
+              <label>رابط دليل البرامج EPG (اختياري)</label>
+              <input id="m3uEpg" type="url" dir="ltr" placeholder="http://provider.com/xmltv.php" maxlength="2048" />
+            </div>
+            <button type="submit" id="btnSendM3u" class="btn btn-violet" style="width:100%;">
+              🚀 إرسال M3U للتلفاز دابا
+            </button>
+          </form>
+        </div>
+
+        <!-- Paired Devices Card -->
+        <div class="card">
+          <h2>📺 الأجهزة المرتبطة (<span id="deviceCount">0</span>)</h2>
+          <p class="muted" style="margin-bottom:12px;">
+            أي تلفاز أو تيليفون فيه تطبيق <strong>divi</strong> ومسجّل بنفس حساب Google كيبان هنا بالـ MAC و Key ديالو.
+          </p>
+          <div id="devicesList" class="list">
+            <div class="muted">جاري التحميل...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sent Remote Playlists -->
+      <div class="card">
+        <h2>☁️ الاشتراكات المرسلة عن بُعد (<span id="playlistCount">0</span>)</h2>
+        <div id="playlistsList" class="list">
+          <div class="muted">لا توجد اشتراكات مرسلة بعد.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAe8Clxehj_M9gDysIFNd_tSJ0CKjrb5kM",
+      authDomain: "secret-element-444503-h7.firebaseapp.com",
+      projectId: "secret-element-444503-h7",
+      storageBucket: "secret-element-444503-h7.firebasestorage.app",
+      messagingSenderId: "835504244174",
+      appId: "1:835504244174:android:11249695609c8aab2a579f"
+    };
+    const DATABASE_ID = "ai-studio-android-diviplay-341b0f81-a131-4e64-a1ad-3c92b8edd922";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app, DATABASE_ID);
+    const provider = new GoogleAuthProvider();
+
+    const alertBox = document.getElementById("alertBox");
+    const authSection = document.getElementById("authSection");
+    const dashboardSection = document.getElementById("dashboardSection");
+    const userBar = document.getElementById("userBar");
+    const userEmailEl = document.getElementById("userEmail");
+    const targetMacSelect = document.getElementById("targetMacSelect");
+    const devicesList = document.getElementById("devicesList");
+    const playlistsList = document.getElementById("playlistsList");
+    const deviceCount = document.getElementById("deviceCount");
+    const playlistCount = document.getElementById("playlistCount");
+
+    if (location.protocol === "file:") {
+      document.getElementById("fileProtocolHint").classList.remove("hidden");
+    }
+
+    function showAlert(msg, isError = false) {
+      alertBox.textContent = msg;
+      alertBox.className = "alert " + (isError ? "err" : "ok");
+      setTimeout(() => { alertBox.className = "alert"; }, 5000);
+    }
+
+    // Tabs
+    const tabXtream = document.getElementById("tabXtream");
+    const tabM3u = document.getElementById("tabM3u");
+    const xtreamForm = document.getElementById("xtreamForm");
+    const m3uForm = document.getElementById("m3uForm");
+
+    tabXtream.onclick = () => {
+      tabXtream.classList.add("active"); tabM3u.classList.remove("active");
+      xtreamForm.classList.remove("hidden"); m3uForm.classList.add("hidden");
+    };
+    tabM3u.onclick = () => {
+      tabM3u.classList.add("active"); tabXtream.classList.remove("active");
+      m3uForm.classList.remove("hidden"); xtreamForm.classList.add("hidden");
+    };
+
+    document.getElementById("btnSignIn").onclick = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        if (e.code === "auth/unauthorized-domain") {
+          showAlert("خاص تزيد الدومين (" + location.hostname + ") فـ Firebase Console -> Authentication -> Settings -> Authorized domains", true);
+        } else {
+          showAlert("خطأ فالدخول: " + e.message, true);
+        }
+      }
+    };
+
+    document.getElementById("btnSignOut").onclick = () => signOut(auth);
+
+    let unsubDevices = null;
+    let unsubPlaylists = null;
+    let currentUser = null;
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (unsubDevices) { unsubDevices(); unsubDevices = null; }
+      if (unsubPlaylists) { unsubPlaylists(); unsubPlaylists = null; }
+
+      if (!user) {
+        authSection.classList.remove("hidden");
+        dashboardSection.classList.add("hidden");
+        userBar.classList.add("hidden");
+        return;
+      }
+
+      authSection.classList.add("hidden");
+      dashboardSection.classList.remove("hidden");
+      userBar.classList.remove("hidden");
+      userEmailEl.textContent = user.email || user.uid;
+
+      // Listen to Devices
+      unsubDevices = onSnapshot(collection(db, "users", user.uid, "devices"), (snap) => {
+        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        deviceCount.textContent = list.length;
+
+        const prevVal = targetMacSelect.value;
+        targetMacSelect.innerHTML = `<option value="ALL">كل الأجهزة المرتبطة (ALL Devices)</option>`;
+        list.forEach(dev => {
+          const opt = document.createElement("option");
+          opt.value = dev.deviceMac;
+          opt.textContent = `${dev.platform === "TV" ? "📺" : "📱"} ${dev.deviceName} (${dev.deviceMac})`;
+          targetMacSelect.appendChild(opt);
+        });
+        if ([...targetMacSelect.options].some(o => o.value === prevVal)) {
+          targetMacSelect.value = prevVal;
+        }
+
+        if (list.length === 0) {
+          devicesList.innerHTML = `<div class="muted">افتح تطبيق divi فالتلفاز وسجّل الدخول بنفس الإيميل باش يبان هنا.</div>`;
+          return;
+        }
+
+        devicesList.innerHTML = list.map(dev => `
+          <div class="item">
+            <div>
+              <div>
+                <span class="badge ${dev.platform === "TV" ? "badge-tv" : "badge-violet"}">${escapeHtml(dev.platform)}</span>
+                <strong>${escapeHtml(dev.deviceName)}</strong>
+              </div>
+              <div class="muted" style="margin-top:6px;">
+                MAC: <span class="mono" style="color:var(--cyan);">${escapeHtml(dev.deviceMac)}</span>
+                &nbsp;•&nbsp;
+                Key: <span class="mono" style="color:var(--violet);">${escapeHtml(dev.deviceKey)}</span>
+              </div>
+            </div>
+            <button class="btn btn-red" data-del-dev="${escapeHtml(dev.id)}">حذف</button>
+          </div>
+        `).join("");
+
+        devicesList.querySelectorAll("[data-del-dev]").forEach(btn => {
+          btn.onclick = async () => {
+            try {
+              await deleteDoc(doc(db, "users", user.uid, "devices", btn.dataset.delDev));
+              showAlert("تم حذف الجهاز بنجاح.");
+            } catch (e) { showAlert(e.message, true); }
+          };
+        });
+      }, (err) => showAlert("خطأ فجلب الأجهزة: " + err.message, true));
+
+      // Listen to Remote Playlists
+      unsubPlaylists = onSnapshot(collection(db, "users", user.uid, "remote_playlists"), (snap) => {
+        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        playlistCount.textContent = list.length;
+
+        if (list.length === 0) {
+          playlistsList.innerHTML = `<div class="muted">مازال ما صيفطتي حتى اشتراك. استعمل الاستمارة الفوق باش تصيفط أول قائمة للتلفاز!</div>`;
+          return;
+        }
+
+        playlistsList.innerHTML = list.map(pl => `
+          <div class="item">
+            <div style="flex:1;min-width:220px;">
+              <div>
+                <span class="badge">${escapeHtml(pl.playlistType)}</span>
+                <span class="badge badge-violet">Target: ${escapeHtml(pl.targetMac)}</span>
+                <strong>${escapeHtml(pl.name)}</strong>
+              </div>
+              <div class="muted mono" style="margin-top:6px;word-break:break-all;">
+                ${pl.playlistType === "XTREAM"
+                  ? `${escapeHtml(pl.serverUrl)} (${escapeHtml(pl.username)})`
+                  : escapeHtml(pl.m3uUrl)}
+              </div>
+            </div>
+            <button class="btn btn-red" data-del-pl="${escapeHtml(pl.id)}">حذف</button>
+          </div>
+        `).join("");
+
+        playlistsList.querySelectorAll("[data-del-pl]").forEach(btn => {
+          btn.onclick = async () => {
+            try {
+              await deleteDoc(doc(db, "users", user.uid, "remote_playlists", btn.dataset.delPl));
+              showAlert("تم حذف الاشتراك من السحابة.");
+            } catch (e) { showAlert(e.message, true); }
+          };
+        });
+      }, (err) => showAlert("خطأ فجلب القوائم: " + err.message, true));
+    });
+
+    // Send Xtream
+    xtreamForm.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const btn = document.getElementById("btnSendXtream");
+      btn.disabled = true;
+      try {
+        await addDoc(collection(db, "users", currentUser.uid, "remote_playlists"), {
+          userId: currentUser.uid,
+          targetMac: targetMacSelect.value || "ALL",
+          name: document.getElementById("xtName").value.trim().slice(0, 100),
+          playlistType: "XTREAM",
+          serverUrl: document.getElementById("xtServer").value.trim().slice(0, 512),
+          username: document.getElementById("xtUser").value.trim().slice(0, 128),
+          password: document.getElementById("xtPass").value.trim().slice(0, 128),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        xtreamForm.reset();
+        showAlert("✅ تم إرسال اشتراك Xtream بنجاح! غيبان فالتلفاز فثواني.");
+      } catch (err) {
+        showAlert("فشل الإرسال: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Send M3U
+    m3uForm.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const btn = document.getElementById("btnSendM3u");
+      btn.disabled = true;
+      try {
+        const payload = {
+          userId: currentUser.uid,
+          targetMac: targetMacSelect.value || "ALL",
+          name: document.getElementById("m3uName").value.trim().slice(0, 100),
+          playlistType: "M3U",
+          m3uUrl: document.getElementById("m3uUrl").value.trim().slice(0, 2048),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+        const epg = document.getElementById("m3uEpg").value.trim().slice(0, 2048);
+        if (epg) payload.epgUrl = epg;
+
+        await addDoc(collection(db, "users", currentUser.uid, "remote_playlists"), payload);
+        m3uForm.reset();
+        showAlert("✅ تم إرسال رابط M3U بنجاح! غيبان فالتلفاز فثواني.");
+      } catch (err) {
+        showAlert("فشل الإرسال: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

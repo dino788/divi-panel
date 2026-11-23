@@ -1,0 +1,6 @@
+{
+  "name": "divi",
+  "description": "IPTV media player inspired by IBO Player supporting M3U playlists, Xtream Codes API, Live TV, Movies, Series, EPG, Favorites, and full-featured ExoPlayer playback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

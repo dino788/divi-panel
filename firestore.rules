@@ -1,0 +1,115 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Deny all access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Helpers ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // --- Validation Blueprints ---
+    function isValidDevice(data, userId) {
+      return data.userId is string && data.userId == userId &&
+             data.deviceMac is string && data.deviceMac.size() >= 5 && data.deviceMac.size() <= 32 &&
+             data.deviceKey is string && data.deviceKey.size() >= 4 && data.deviceKey.size() <= 16 &&
+             data.deviceName is string && data.deviceName.size() >= 1 && data.deviceName.size() <= 80 &&
+             data.platform is string && data.platform in ['TV', 'PHONE'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidRemotePlaylist(data, userId) {
+      return data.userId is string && data.userId == userId &&
+             data.targetMac is string && data.targetMac.size() >= 3 && data.targetMac.size() <= 32 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.playlistType is string && data.playlistType in ['M3U', 'XTREAM'] &&
+             (!('m3uUrl' in data) || (data.m3uUrl is string && data.m3uUrl.size() <= 2048)) &&
+             (!('serverUrl' in data) || (data.serverUrl is string && data.serverUrl.size() <= 512)) &&
+             (!('username' in data) || (data.username is string && data.username.size() <= 128)) &&
+             (!('password' in data) || (data.password is string && data.password.size() <= 128)) &&
+             (!('epgUrl' in data) || (data.epgUrl is string && data.epgUrl.size() <= 2048)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // --- User-Scoped Devices Collection ---
+    match /users/{userId}/devices/{deviceId} {
+      allow get: if isOwner(userId) && isValidId(deviceId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(deviceId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'deviceMac', 'deviceKey', 'deviceName', 'platform', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'deviceMac', 'deviceKey', 'deviceName', 'platform', 'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidDevice(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(deviceId) &&
+                       isValidDevice(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'deviceMac', 'deviceKey', 'deviceName', 'platform', 'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(deviceId);
+    }
+
+    // --- User-Scoped Remote Playlists Collection ---
+    match /users/{userId}/remote_playlists/{playlistId} {
+      allow get: if isOwner(userId) && isValidId(playlistId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(playlistId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'targetMac', 'name', 'playlistType', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'targetMac', 'name', 'playlistType',
+                         'm3uUrl', 'serverUrl', 'username', 'password', 'epgUrl',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidRemotePlaylist(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(playlistId) &&
+                       isValidRemotePlaylist(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'targetMac', 'name', 'playlistType',
+                         'm3uUrl', 'serverUrl', 'username', 'password', 'epgUrl',
+                         'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(playlistId);
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep obsidian cinema base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:startColor="#0B0D14"
+                android:centerColor="#121A2E"
+                android:endColor="#1D1438" />
+        </shape>
+    </item>
+    <!-- Subtle glowing cyan accent bar at bottom -->
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <size android:height="6dp" />
+            <gradient
+                android:angle="0"
+                android:startColor="#00D4FF"
+                android:endColor="#8B5CF6" />
+        </shape>
+    </item>
+    <!-- Centered divi emblem -->
+    <item
+        android:width="116dp"
+        android:height="116dp"
+        android:drawable="@drawable/ic_divi_foreground"
+        android:gravity="center" />
+</layer-list>

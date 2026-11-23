@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "DeviceRegistration": {
+      "title": "DeviceRegistration",
+      "description": "A divi TV or Phone device registered under the user's cloud remote panel.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the device owner."
+        },
+        "deviceMac": {
+          "type": "string",
+          "description": "Virtual MAC address displayed on the device (e.g. D4:A1:B2:C3:E4:F5)."
+        },
+        "deviceKey": {
+          "type": "string",
+          "description": "6-digit pairing key displayed on the device."
+        },
+        "deviceName": {
+          "type": "string",
+          "description": "Human-readable device model or nickname."
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["TV", "PHONE"],
+          "description": "Whether the device is an Android TV or Phone/Tablet."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the device was first registered (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last check-in (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "deviceMac",
+        "deviceKey",
+        "deviceName",
+        "platform",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "RemotePlaylist": {
+      "title": "RemotePlaylist",
+      "description": "An IPTV M3U or Xtream Codes subscription pushed remotely from the web control panel or another device.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner."
+        },
+        "targetMac": {
+          "type": "string",
+          "description": "Target device MAC address or 'ALL' for every device on the account."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name for the IPTV playlist."
+        },
+        "playlistType": {
+          "type": "string",
+          "enum": ["M3U", "XTREAM"],
+          "description": "Type of IPTV source."
+        },
+        "m3uUrl": {
+          "type": "string",
+          "description": "Optional M3U/M3U8 playlist URL."
+        },
+        "serverUrl": {
+          "type": "string",
+          "description": "Optional Xtream Codes server host URL."
+        },
+        "username": {
+          "type": "string",
+          "description": "Optional Xtream Codes username."
+        },
+        "password": {
+          "type": "string",
+          "description": "Optional Xtream Codes password."
+        },
+        "epgUrl": {
+          "type": "string",
+          "description": "Optional XMLTV EPG URL."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last modified (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "targetMac",
+        "name",
+        "playlistType",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": {
+        "$ref": "#/entities/DeviceRegistration"
+      },
+      "description": "User's registered Android TV and Phone divi devices."
+    },
+    "/users/{userId}/remote_playlists/{playlistId}": {
+      "schema": {
+        "$ref": "#/entities/RemotePlaylist"
+      },
+      "description": "Remote IPTV M3U and Xtream subscriptions pushed from the web control panel."
+    }
+  }
+}

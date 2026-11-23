@@ -1,0 +1,109 @@
+<resources>
+    <string name="app_name">divi</string>
+
+    <!-- Navigation & Main Tiles -->
+    <string name="nav_home">Home</string>
+    <string name="nav_live_tv">Live TV</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_series">Series</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_recent">Recent</string>
+    <string name="nav_playlists">Playlists</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_search">Search</string>
+
+    <!-- Tile Subtitles -->
+    <string name="tile_live_subtitle">Channels &amp; EPG</string>
+    <string name="tile_movies_subtitle">VOD Cinema</string>
+    <string name="tile_series_subtitle">TV Shows &amp; Seasons</string>
+
+    <!-- Onboarding & Empty States -->
+    <string name="welcome_title">Welcome to divi</string>
+    <string name="welcome_subtitle">Connect your Xtream Codes account or M3U playlist to stream Live TV, Movies, and Series with the built-in Pro Player.</string>
+    <string name="action_add_xtream">Add Xtream Codes</string>
+    <string name="action_add_m3u">Add M3U URL</string>
+    <string name="action_import_file">Import .M3U File</string>
+    <string name="empty_channels_title">No Channels Found</string>
+    <string name="empty_channels_subtitle">Try selecting another category, clearing your search, or syncing your playlist.</string>
+    <string name="empty_movies_title">No Movies Found</string>
+    <string name="empty_series_title">No Series Found</string>
+    <string name="empty_favorites_title">No Favorites Yet</string>
+    <string name="empty_favorites_subtitle">Tap the star icon on any channel, movie, or series to pin it here for quick access.</string>
+    <string name="empty_recent_title">No Watch History</string>
+    <string name="empty_recent_subtitle">Channels, movies, and episodes you watch will appear here so you can resume anytime.</string>
+
+    <!-- Playlist Manager -->
+    <string name="playlists_title">Playlist Manager</string>
+    <string name="playlist_add_new">Add Playlist</string>
+    <string name="playlist_tab_xtream">Xtream Codes</string>
+    <string name="playlist_tab_m3u_url">M3U URL</string>
+    <string name="playlist_tab_m3u_file">Local File</string>
+    <string name="label_playlist_name">Playlist Name</string>
+    <string name="label_server_url">Server URL (http://host:port)</string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+    <string name="label_m3u_url">M3U / M3U8 Playlist URL</string>
+    <string name="label_epg_url">EPG XMLTV URL (Optional)</string>
+    <string name="action_connect_playlist">Connect &amp; Load</string>
+    <string name="action_pick_m3u_file">Choose .m3u / .m3u8 File</string>
+    <string name="playlist_active_badge">ACTIVE</string>
+    <string name="device_info_title">Device Identity</string>
+    <string name="device_mac_label">MAC Address</string>
+    <string name="device_key_label">Device Key</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_refresh">Sync</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Player Controls -->
+    <string name="player_live_badge">LIVE</string>
+    <string name="player_channels">Channels</string>
+    <string name="player_audio_tracks">Audio</string>
+    <string name="player_subtitles">Subtitles</string>
+    <string name="player_aspect_ratio">Aspect</string>
+    <string name="player_speed">Speed</string>
+    <string name="player_stream_info">Info</string>
+    <string name="player_retry">Retry Stream</string>
+    <string name="player_locked">Screen Locked — Tap to Unlock</string>
+    <string name="player_epg_now">Now Playing</string>
+    <string name="player_epg_next">Up Next</string>
+    <string name="player_epg_unavailable">No program guide info available</string>
+    <string name="player_watch_fullscreen">Fullscreen</string>
+
+    <!-- Movie & Series Details -->
+    <string name="action_play_now">Play Now</string>
+    <string name="action_resume">Resume</string>
+    <string name="label_synopsis">Synopsis</string>
+    <string name="label_cast">Cast</string>
+    <string name="label_director">Director</string>
+    <string name="label_seasons">Seasons</string>
+    <string name="label_episodes">Episodes</string>
+
+    <!-- Settings -->
+    <string name="settings_player_section">Player Engine</string>
+    <string name="settings_stream_format">Xtream Live Stream Format</string>
+    <string name="settings_buffer_profile">Buffer Profile</string>
+    <string name="settings_aspect_ratio">Default Aspect Ratio</string>
+    <string name="settings_user_agent">HTTP User-Agent</string>
+    <string name="settings_parental_section">Parental Control</string>
+    <string name="settings_parental_pin">Parental PIN</string>
+    <string name="settings_data_section">Playlist &amp; Storage</string>
+    <string name="settings_clear_history">Clear Watch History</string>
+    <string name="settings_account_section">Account &amp; Device Info</string>
+
+    <!-- Common -->
+    <string name="cd_back">Navigate back</string>
+    <string name="cd_search">Search content</string>
+    <string name="cd_settings">Open settings</string>
+    <string name="cd_refresh">Refresh playlist</string>
+    <string name="cd_favorite">Toggle favorite</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_lock">Lock player controls</string>
+    <string name="cd_rotate">Rotate screen</string>
+    <string name="cd_channel_list">Open channel list</string>
+    <string name="cd_divi_logo">divi logo</string>
+    <string name="cd_close">Close</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_unlock">Unlock</string>
+</resources>
