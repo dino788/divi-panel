@@ -50,6 +50,7 @@
     .btn-cyan { background: var(--cyan); color: #07090F; }
     .btn-violet { background: var(--violet); color: #fff; }
     .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 9px; }
     .btn-red { background: rgba(255,77,109,.16); color: var(--red); border: 1px solid rgba(255,77,109,.4); padding: 8px 12px; }
     .card {
       background: var(--surface); border: 1px solid var(--border);
@@ -57,6 +58,7 @@
     }
     .card h2 { font-size: 17px; margin-bottom: 14px; }
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+    .row-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
     .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
     .tab {
       flex: 1; padding: 11px; text-align: center; border-radius: 12px; cursor: pointer;
@@ -70,11 +72,22 @@
       background: var(--surface-hi); color: var(--text); font-size: 14px; outline: none;
     }
     .field input:focus, .field select:focus { border-color: var(--cyan); }
+    .mac-box {
+      background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.32);
+      border-radius: 16px; padding: 14px; margin-bottom: 16px;
+    }
+    .mac-box-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; gap: 8px; flex-wrap: wrap;
+    }
+    .mac-box-head span { font-size: 13px; font-weight: 700; color: var(--cyan); }
     .list { display: flex; flex-direction: column; gap: 10px; }
     .item {
       background: var(--surface-hi); border: 1px solid var(--border); border-radius: 14px;
       padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
     }
+    .item-clickable { cursor: pointer; transition: border-color .15s; }
+    .item-clickable:hover { border-color: var(--cyan); }
     .badge {
       display: inline-block; padding: 3px 9px; border-radius: 8px; font-size: 11px; font-weight: 700;
       background: rgba(0,229,255,.15); color: var(--cyan); margin-right: 6px;
@@ -99,38 +112,56 @@
         <div class="logo-badge">divi</div>
         <div>
           <h1>divi Remote Panel</h1>
-          <p>Sift Xtream Codes & M3U l TV mn lb3id bhal IBO Player</p>
+          <p>Sift Xtream Codes & M3U l TV b MAC & Device Key bhal IBO Player</p>
         </div>
       </div>
       <div id="userBar" class="hidden" style="display:flex;align-items:center;gap:10px;">
         <span id="userEmail" class="muted mono"></span>
-        <button id="btnSignOut" class="btn btn-outline">Sign Out</button>
+        <button id="btnSignOut" class="btn btn-outline btn-sm">Sign Out</button>
       </div>
     </div>
 
     <div id="alertBox" class="alert"></div>
 
+    <!-- Google Sign-In Gate -->
     <div id="authSection" class="card auth-box">
       <h2>Sign in with Google</h2>
       <p>
         Dkhol bnfs compte Google li mconnecti bih f app <strong>divi</strong> f TV dyalk.
-        Ay playlist tsiftha mn hna ghatwsel l TV f tawani!
+        Mura hadchi dkhel <strong>MAC Address</strong> w <strong>Device Key</strong> dyal TV w sift ay ichtirak f tawani!
       </p>
       <button id="btnSignIn" class="btn btn-cyan" style="padding:14px 28px;font-size:15px;">
         Sign in with Google
       </button>
+      <div id="authMsg" class="muted" style="margin-top:14px;color:#ff9eb0;word-break:break-word;"></div>
     </div>
 
+    <!-- Main Dashboard -->
     <div id="dashboardSection" class="hidden">
       <div class="grid-2">
+        <!-- Send Playlist Card -->
         <div class="card">
-          <h2>Send Playlist to TV</h2>
+          <h2>Send Subscription to TV</h2>
 
-          <div class="field">
-            <label>Target Device (TV / Phone):</label>
-            <select id="targetMacSelect">
-              <option value="ALL">ALL Devices</option>
-            </select>
+          <!-- Direct MAC Address + Device Key Box (IBO Player Style) -->
+          <div class="mac-box">
+            <div class="mac-box-head">
+              <span>Device MAC & Key (IBO Style)</span>
+              <button type="button" id="btnTargetAll" class="btn btn-outline btn-sm">ALL Devices</button>
+            </div>
+            <div class="row-2">
+              <div class="field" style="margin-bottom:0;">
+                <label>MAC Address (or ALL)</label>
+                <input id="inputMac" class="mono" type="text" placeholder="02:a1:b2:c3:d4:e5" value="ALL" required maxlength="32" />
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Device Key (6 digits)</label>
+                <input id="inputKey" class="mono" type="text" placeholder="482910" maxlength="16" />
+              </div>
+            </div>
+            <p class="muted" style="margin-top:8px;font-size:12px;">
+              Kteb MAC w Key dyal TV direct, ola cliki 3la TV mn liste li f jnb bach yt3mro bo7dhom!
+            </p>
           </div>
 
           <div class="tabs">
@@ -179,10 +210,11 @@
           </form>
         </div>
 
+        <!-- Connected Devices Card -->
         <div class="card">
-          <h2>Connected Devices (<span id="deviceCount">0</span>)</h2>
+          <h2>Connected TVs & Phones (<span id="deviceCount">0</span>)</h2>
           <p class="muted" style="margin-bottom:12px;">
-            Ay TV ola tilifon fih <strong>divi</strong> mconnecti b compte Google dyalk kayban hna b MAC w Key.
+            Cliki 3la ay device hna bach yt3mer MAC w Key dyalo f blasthom!
           </p>
           <div id="devicesList" class="list">
             <div class="muted">Loading...</div>
@@ -190,6 +222,7 @@
         </div>
       </div>
 
+      <!-- Sent Remote Playlists -->
       <div class="card">
         <h2>Sent Remote Playlists (<span id="playlistCount">0</span>)</h2>
         <div id="playlistsList" class="list">
@@ -201,7 +234,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -224,17 +257,26 @@
     const dashboardSection = document.getElementById("dashboardSection");
     const userBar = document.getElementById("userBar");
     const userEmailEl = document.getElementById("userEmail");
-    const targetMacSelect = document.getElementById("targetMacSelect");
+    const inputMac = document.getElementById("inputMac");
+    const inputKey = document.getElementById("inputKey");
     const devicesList = document.getElementById("devicesList");
     const playlistsList = document.getElementById("playlistsList");
     const deviceCount = document.getElementById("deviceCount");
     const playlistCount = document.getElementById("playlistCount");
+
+    let knownDevices = [];
 
     function showAlert(msg, isError = false) {
       alertBox.textContent = msg;
       alertBox.className = "alert " + (isError ? "err" : "ok");
       setTimeout(() => { alertBox.className = "alert"; }, 5000);
     }
+
+    document.getElementById("btnTargetAll").onclick = () => {
+      inputMac.value = "ALL";
+      inputKey.value = "";
+      showAlert("Target set to ALL Devices.");
+    };
 
     const tabXtream = document.getElementById("tabXtream");
     const tabM3u = document.getElementById("tabM3u");
@@ -250,15 +292,49 @@
       m3uForm.classList.remove("hidden"); xtreamForm.classList.add("hidden");
     };
 
-    document.getElementById("btnSignIn").onclick = async () => {
+    const authMsg = document.getElementById("authMsg");
+    const btnSignIn = document.getElementById("btnSignIn");
+
+    function formatAuthError(e) {
+      if (e.code === "auth/unauthorized-domain") {
+        return "Zid domain (" + location.hostname + ") f Firebase Console -> Authentication -> Settings -> Authorized domains.";
+      }
+      if (e.code === "auth/operation-not-allowed") {
+        return "Google Sign-In mazal ma m-activich f Firebase Console -> Authentication -> Sign-in method -> Google -> Enable.";
+      }
+      return "Error (" + (e.code || "unknown") + "): " + (e.message || e);
+    }
+
+    getRedirectResult(auth).catch((e) => {
+      authMsg.textContent = formatAuthError(e);
+      showAlert(formatAuthError(e), true);
+    });
+
+    btnSignIn.onclick = async () => {
+      authMsg.style.color = "var(--cyan)";
+      authMsg.textContent = "Opening Google Sign-In...";
+      btnSignIn.disabled = true;
       try {
         await signInWithPopup(auth, provider);
+        authMsg.textContent = "";
       } catch (e) {
-        if (e.code === "auth/unauthorized-domain") {
-          showAlert("Zid had domain (" + location.hostname + ") f Firebase Console -> Authentication -> Settings -> Authorized domains", true);
+        if (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment") {
+          authMsg.textContent = "Popup blocked, redirecting to Google...";
+          try {
+            await signInWithRedirect(auth, provider);
+            return;
+          } catch (re) {
+            authMsg.style.color = "#ff9eb0";
+            authMsg.textContent = formatAuthError(re);
+            showAlert(formatAuthError(re), true);
+          }
         } else {
-          showAlert("Sign-in error: " + e.message, true);
+          authMsg.style.color = "#ff9eb0";
+          authMsg.textContent = formatAuthError(e);
+          showAlert(formatAuthError(e), true);
         }
+      } finally {
+        btnSignIn.disabled = false;
       }
     };
 
@@ -270,6 +346,23 @@
 
     function escapeHtml(str) {
       return String(str || "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
+    }
+
+    function validateMacAndKey() {
+      const mac = inputMac.value.trim();
+      const key = inputKey.value.trim();
+      if (!mac || mac.length < 3) {
+        showAlert("Kteb MAC Address ola ALL.", true);
+        return null;
+      }
+      if (mac.toUpperCase() !== "ALL" && key) {
+        const matched = knownDevices.find(d => (d.deviceMac || "").toLowerCase() === mac.toLowerCase());
+        if (matched && matched.deviceKey && matched.deviceKey !== key) {
+          showAlert("Device Key ghalet l had MAC! Key sa7i7 howa: " + matched.deviceKey, true);
+          return null;
+        }
+      }
+      return mac.toUpperCase() === "ALL" ? "ALL" : mac.toLowerCase().slice(0, 32);
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -290,28 +383,16 @@
       userEmailEl.textContent = user.email || user.uid;
 
       unsubDevices = onSnapshot(collection(db, "users", user.uid, "devices"), (snap) => {
-        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        deviceCount.textContent = list.length;
+        knownDevices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        deviceCount.textContent = knownDevices.length;
 
-        const prevVal = targetMacSelect.value;
-        targetMacSelect.innerHTML = `<option value="ALL">ALL Devices</option>`;
-        list.forEach(dev => {
-          const opt = document.createElement("option");
-          opt.value = dev.deviceMac;
-          opt.textContent = `[${dev.platform}] ${dev.deviceName} (${dev.deviceMac})`;
-          targetMacSelect.appendChild(opt);
-        });
-        if ([...targetMacSelect.options].some(o => o.value === prevVal)) {
-          targetMacSelect.value = prevVal;
-        }
-
-        if (list.length === 0) {
+        if (knownDevices.length === 0) {
           devicesList.innerHTML = `<div class="muted">Hll app divi f TV w dkhol b nfs compte Google bach yban hna.</div>`;
           return;
         }
 
-        devicesList.innerHTML = list.map(dev => `
-          <div class="item">
+        devicesList.innerHTML = knownDevices.map(dev => `
+          <div class="item item-clickable" data-pick-mac="${escapeHtml(dev.deviceMac)}" data-pick-key="${escapeHtml(dev.deviceKey)}">
             <div>
               <div>
                 <span class="badge ${dev.platform === "TV" ? "badge-tv" : "badge-violet"}">${escapeHtml(dev.platform)}</span>
@@ -323,16 +404,29 @@
                 Key: <span class="mono" style="color:var(--violet);">${escapeHtml(dev.deviceKey)}</span>
               </div>
             </div>
-            <button class="btn btn-red" data-del-dev="${escapeHtml(dev.id)}">Delete</button>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-cyan btn-sm" data-select-btn>Select</button>
+              <button type="button" class="btn btn-red btn-sm" data-del-dev="${escapeHtml(dev.id)}">Delete</button>
+            </div>
           </div>
         `).join("");
 
+        devicesList.querySelectorAll("[data-pick-mac]").forEach(card => {
+          card.onclick = (e) => {
+            if (e.target.closest("[data-del-dev]")) return;
+            inputMac.value = card.dataset.pickMac || "ALL";
+            inputKey.value = card.dataset.pickKey || "";
+            showAlert("Selected TV: " + inputMac.value);
+          };
+        });
+
         devicesList.querySelectorAll("[data-del-dev]").forEach(btn => {
-          btn.onclick = async () => {
+          btn.onclick = async (e) => {
+            e.stopPropagation();
             try {
               await deleteDoc(doc(db, "users", user.uid, "devices", btn.dataset.delDev));
               showAlert("Device removed.");
-            } catch (e) { showAlert(e.message, true); }
+            } catch (err) { showAlert(err.message, true); }
           };
         });
       }, (err) => showAlert("Devices error: " + err.message, true));
@@ -351,7 +445,7 @@
             <div style="flex:1;min-width:220px;">
               <div>
                 <span class="badge">${escapeHtml(pl.playlistType)}</span>
-                <span class="badge badge-violet">Target: ${escapeHtml(pl.targetMac)}</span>
+                <span class="badge badge-violet">MAC: ${escapeHtml(pl.targetMac)}</span>
                 <strong>${escapeHtml(pl.name)}</strong>
               </div>
               <div class="muted mono" style="margin-top:6px;word-break:break-all;">
@@ -360,7 +454,7 @@
                   : escapeHtml(pl.m3uUrl)}
               </div>
             </div>
-            <button class="btn btn-red" data-del-pl="${escapeHtml(pl.id)}">Delete</button>
+            <button class="btn btn-red btn-sm" data-del-pl="${escapeHtml(pl.id)}">Delete</button>
           </div>
         `).join("");
 
@@ -378,12 +472,14 @@
     xtreamForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!currentUser) return;
+      const targetMac = validateMacAndKey();
+      if (!targetMac) return;
       const btn = document.getElementById("btnSendXtream");
       btn.disabled = true;
       try {
         await addDoc(collection(db, "users", currentUser.uid, "remote_playlists"), {
           userId: currentUser.uid,
-          targetMac: targetMacSelect.value || "ALL",
+          targetMac,
           name: document.getElementById("xtName").value.trim().slice(0, 100),
           playlistType: "XTREAM",
           serverUrl: document.getElementById("xtServer").value.trim().slice(0, 512),
@@ -393,7 +489,7 @@
           updatedAt: serverTimestamp()
         });
         xtreamForm.reset();
-        showAlert("Xtream sent! Ghaywsel l TV f tawani.");
+        showAlert("Xtream sent to " + targetMac + "! Ghaywsel l TV f tawani.");
       } catch (err) {
         showAlert("Error: " + err.message, true);
       } finally {
@@ -404,12 +500,14 @@
     m3uForm.onsubmit = async (e) => {
       e.preventDefault();
       if (!currentUser) return;
+      const targetMac = validateMacAndKey();
+      if (!targetMac) return;
       const btn = document.getElementById("btnSendM3u");
       btn.disabled = true;
       try {
         const payload = {
           userId: currentUser.uid,
-          targetMac: targetMacSelect.value || "ALL",
+          targetMac,
           name: document.getElementById("m3uName").value.trim().slice(0, 100),
           playlistType: "M3U",
           m3uUrl: document.getElementById("m3uUrl").value.trim().slice(0, 2048),
@@ -421,7 +519,7 @@
 
         await addDoc(collection(db, "users", currentUser.uid, "remote_playlists"), payload);
         m3uForm.reset();
-        showAlert("M3U sent! Ghaywsel l TV f tawani.");
+        showAlert("M3U sent to " + targetMac + "! Ghaywsel l TV f tawani.");
       } catch (err) {
         showAlert("Error: " + err.message, true);
       } finally {
